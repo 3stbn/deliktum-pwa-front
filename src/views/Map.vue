@@ -53,8 +53,8 @@ export default {
       clusters: null,
       map: null,
       eventLocation: {
-        lng: center[0],
-        lat: center[1]
+        lng: null,
+        lat: null
       },
       marker: null
     }
@@ -70,12 +70,12 @@ export default {
     },
     newIncident () {
       this.newEvent = !this.newEvent
-      if(this.newEvent === false && this.marker != null ) {
-        this.marker.remove()  
+      if (this.newEvent === false && this.marker != null) {
+        this.marker.remove()
       } else {
         let lng = this.map.getCenter().lng
         let lat = this.map.getCenter().lat
-        this.addMarker(lng,lat)
+        this.addMarker(lng, lat)
       }
     },
     addControls () {
@@ -83,40 +83,43 @@ export default {
       var geocoder = new MapboxGeocoder({
         accessToken: mapboxgl.accessToken,
         country: 'ec',
-        placeholder: this.searchPlaceholder,
-      });
+        placeholder: this.searchPlaceholder
+      })
       var geolocator = new mapboxgl.GeolocateControl({
         positionOptions: {
-            enableHighAccuracy: true
+          enableHighAccuracy: true
         },
         trackUserLocation: true
       })
       this.map.addControl(geocoder)
       geocoder.on('result', (ev) => {
-        if(this.newEvent === true) {
+        if (this.newEvent === true) {
           this.addMarker(ev.result.geometry.coordinates[0], ev.result.geometry.coordinates[1])
         }
-      });
+      })
       this.map.addControl(geolocator)
       geolocator.on('geolocate', (data) => {
-        if(this.newEvent === true) {
+        if (this.newEvent === true) {
           this.addMarker(data.coords.longitude, data.coords.latitude)
         }
       })
-      
     },
-    addMarker (lng,lat) {
-      if(this.marker != null) {
-        this.marker.remove()  
+    addMarker (lng, lat) {
+      if (this.marker != null) {
+        this.marker.remove()
       }
       var marker = new mapboxgl.Marker({
         draggable: true
       })
-      .setLngLat([lng, lat])
-      .addTo(this.map)
+      marker.setLngLat([lng, lat])
+      marker.addTo(this.map)
       this.marker = marker
       this.eventLocation.lng = lng
       this.eventLocation.lat = lat
+      marker.on('dragend', (marker) => {
+        this.eventLocation.lng = marker.target._lngLat.lng
+        this.eventLocation.lat = marker.target._lngLat.lat
+      })
     },
     drawMap () {
       mapboxgl.accessToken = 'pk.eyJ1Ijoic3RibjkzIiwiYSI6ImNqbzF2anFhdzBmdXozcHF5bjQydXl5enEifQ.AWABpP4jIKH1GYXaXBDI2A'
@@ -130,7 +133,7 @@ export default {
     },
     drawClusters () {
       let clusters = this.clusters
-      this.map.on('load',  () => {
+      this.map.on('load', () => {
         // Add a new source from our GeoJSON data and set the
         // 'cluster' option to true. GL-JS will add the point_count property to your source data.
         this.map.addSource('events', {
@@ -201,7 +204,7 @@ export default {
         })
 
         // inspect a cluster on click
-        this.map.on('click', 'clusters',  (e) => {
+        this.map.on('click', 'clusters', (e) => {
           var features = this.map.queryRenderedFeatures(e.point, { layers: ['clusters'] })
           var clusterId = features[0].properties.cluster_id
           this.map.getSource('events').getClusterExpansionZoom(clusterId, (err, zoom) => {
@@ -212,10 +215,10 @@ export default {
             })
           })
         })
-        this.map.on('mouseenter', 'clusters',  () => {
+        this.map.on('mouseenter', 'clusters', () => {
           this.map.getCanvas().style.cursor = 'pointer'
         })
-        this.map.on('mouseleave', 'clusters',  () => {
+        this.map.on('mouseleave', 'clusters', () => {
           this.map.getCanvas().style.cursor = ''
         })
       })
@@ -234,7 +237,7 @@ export default {
         console.log(features[0].properties)
       })
       this.map.on('click', (MapMouseEvent) => {
-        if(this.newEvent === true ) {
+        if (this.newEvent === true) {
           this.addMarker(MapMouseEvent.lngLat.lng, MapMouseEvent.lngLat.lat)
         }
       })
@@ -248,7 +251,7 @@ export default {
 }
 </script>
 <style>
-.nuevo-evento{ position: absolute; bottom: 70px !important;}
+.nuevo-evento{ position: absolute !important; bottom: 70px !important;}
 #mapaMapbox{  position:absolute; top:0; bottom:0; width:100%; }
 .addIcons {
   top: auto !important;

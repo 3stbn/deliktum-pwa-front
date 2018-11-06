@@ -1,7 +1,7 @@
 <template>
-  <v-app id="deliktum" style="overflow-y: hidden;">
+  <v-app id="deliktum">
     <v-toolbar
-      color="blue darken-2"
+      color="blue darken-3"
       dark
       fixed
       app
@@ -12,6 +12,7 @@
     </v-toolbar>
     <v-navigation-drawer
       v-model="drawer"
+      dark
       fixed
       app
     >
@@ -19,16 +20,17 @@
         <v-list>
           <v-list-tile>
             <v-list-tile-title class="title">
-              Application
+              Delilktum
             </v-list-tile-title>
           </v-list-tile>
         </v-list>
       </v-toolbar>
       <v-divider></v-divider>
-      <v-list dense class="pt-0">
+      <v-list two-line class="pt-0">
         <v-list-tile
           v-for="item in items"
           :key="item.title"
+          @click='console.log(item.title)'
         >
           <v-list-tile-action>
             <v-icon>{{ item.icon }}</v-icon>
@@ -48,14 +50,13 @@
 export default {
   data () {
     return {
-      fab: false,
       drawer: null,
       items: [
-        { title: 'Mapa', icon: 'dashboard' },
-        { title: 'Recientes', icon: 'question_answer' },
-        { title: 'Como Usar', icon: 'question_answer' }
-      ],
-      right: null
+        { title: 'Mapa', icon: 'map' },
+        { title: 'Incidentes Recientes', icon: 'feedback' },
+        { title: 'Reportar Incidente', icon: 'record_voice_over' },
+        { title: 'Como Reportar', icon: 'help' }
+      ]
     }
   },
   props: {
