@@ -30,7 +30,7 @@
         <v-list-tile
           v-for="item in items"
           :key="item.title"
-          @click='console.log(item.title)'
+          @click='handleView(item)'
         >
           <v-list-tile-action>
             <v-icon>{{ item.icon }}</v-icon>
@@ -61,6 +61,11 @@ export default {
   },
   props: {
     source: String
+  },
+  methods: {
+    handleView (item) {
+      console.log(item)
+    }
   }
 }
 </script>

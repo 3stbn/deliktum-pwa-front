@@ -43,6 +43,7 @@ import mapboxgl from 'mapbox-gl/dist/mapbox-gl'
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
 let center = [-78.485172, -0.187670]
 export default {
+  name: 'Map',
   data () {
     return {
       newEvent: false,
