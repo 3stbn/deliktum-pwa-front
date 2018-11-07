@@ -22,6 +22,7 @@
         fab
         dark
         color="green"
+        @click="reportIncident()"
       >
         <v-icon>navigate_next</v-icon>
         <span class="addIcons">SIGUIENTE</span>
@@ -41,6 +42,7 @@
 <script>
 import mapboxgl from 'mapbox-gl/dist/mapbox-gl'
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
+import config from '../../config/default'
 let center = [-78.485172, -0.187670]
 export default {
   name: 'Map',
@@ -53,10 +55,6 @@ export default {
       zoom: 11,
       clusters: null,
       map: null,
-      eventLocation: {
-        lng: null,
-        lat: null
-      },
       marker: null
     }
   },
@@ -80,7 +78,7 @@ export default {
       }
     },
     addControls () {
-      mapboxgl.accessToken = 'pk.eyJ1Ijoic3RibjkzIiwiYSI6ImNqbzF2anFhdzBmdXozcHF5bjQydXl5enEifQ.AWABpP4jIKH1GYXaXBDI2A'
+      mapboxgl.accessToken = config.mapKey
       var geocoder = new MapboxGeocoder({
         accessToken: mapboxgl.accessToken,
         country: 'ec',
@@ -115,15 +113,20 @@ export default {
       marker.setLngLat([lng, lat])
       marker.addTo(this.map)
       this.marker = marker
-      this.eventLocation.lng = lng
-      this.eventLocation.lat = lat
+      this.setLocation(lng,lat)
       marker.on('dragend', (marker) => {
-        this.eventLocation.lng = marker.target._lngLat.lng
-        this.eventLocation.lat = marker.target._lngLat.lat
+        this.setLocation(marker.target._lngLat.lng, marker.target._lngLat.lat )
+      })
+    },
+    setLocation(lng,lat) {
+      this.$store.commit({
+        type: 'eventLocation',
+        lng: lng,
+        lat: lat
       })
     },
     drawMap () {
-      mapboxgl.accessToken = 'pk.eyJ1Ijoic3RibjkzIiwiYSI6ImNqbzF2anFhdzBmdXozcHF5bjQydXl5enEifQ.AWABpP4jIKH1GYXaXBDI2A'
+      mapboxgl.accessToken = config.mapKey
       var map = new mapboxgl.Map({
         container: 'mapaMapbox',
         style: 'mapbox://styles/stbn93/cjo1y90k75i0n2rpcbgbb6feg',
@@ -224,11 +227,10 @@ export default {
         })
       })
     },
-    currentLocation () {
-      navigator.geolocation.getCurrentPosition((position) => {
-        return [position.coords.longitude, position.coords.latitude]
-      })
+    reportIncident () {
+      this.$router.push('report')
     }
+
   },
   watch: {
     map () {

@@ -6,6 +6,10 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+  	eventLocation: {
+        lng: null,
+        lat: null
+    },
   	typesOfIncidents: [
   		{id: 1, name: 'Asalto'},
   		{id: 2, name: 'Robo'},
@@ -20,10 +24,16 @@ export default new Vuex.Store({
   getters: {
   	typesOfIncidents(state) {
   		return state.typesOfIncidents
+  	},
+  	eventLocation (state) {
+  		return state.eventLocation
   	}
   },
   mutations: {
-
+  	eventLocation ( state, location ) {
+  		state.eventLocation.lng = location.lng
+  		state.eventLocation.lat = location.lat
+  	}
   },
   actions: {
 
