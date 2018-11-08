@@ -11,22 +11,25 @@
       <v-toolbar-title>Deliktum</v-toolbar-title>
     </v-toolbar>
     <v-navigation-drawer
+      :permanent="checkPointOfView()"
+      class="panel-left"
       v-model="drawer"
+      color="red"
       dark
       fixed
       app
     >
-      <v-toolbar flat>
+      <v-toolbar flat color="blue darken-4">
         <v-list>
           <v-list-tile>
             <v-list-tile-title class="title">
-              Delilktum
+              Reporta y actúa
             </v-list-tile-title>
           </v-list-tile>
         </v-list>
       </v-toolbar>
       <v-divider></v-divider>
-      <v-list two-line class="pt-0">
+      <v-list two-line class="pt-0" color="blue">
         <v-list-tile
           v-for="item in items"
           :key="item.title"
@@ -42,7 +45,9 @@
       </v-list>
       </v-navigation-drawer>
     <v-content class="contenido">
-      <router-view></router-view>
+      <transition>
+        <router-view></router-view>
+      </transition>
     </v-content>
   </v-app>
 </template>
@@ -64,11 +69,31 @@ export default {
   },
   methods: {
     handleView (item) {
-      console.log(item)
+      this.drawer = !this.drawer
+      if(item.title === 'Reportar Incidente') {
+        this.$store.commit({
+          type: 'newIncident', 
+          router: this.$router,
+          route: this.$route,
+          state: true
+        })
+      }
+    },
+    checkPointOfView ( ) {
+      if(window.innerWidth > 1200 ){
+        return true
+      } else {
+        return false
+      }
     }
-  }
+  },
+  mounted () {
+    this.$store.commit('checkMobile')
+  },
 }
 </script>
 <style>
 #deliktum{ max-height: 100vh }
+.container-pc {max-width: 600px}
+.panel-left { background-color: #3b7db5 !important }
 </style>

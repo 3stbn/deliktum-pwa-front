@@ -10,6 +10,9 @@ export default new Vuex.Store({
         lng: null,
         lat: null
     },
+    checkMobile: null,
+    clusters: [],
+    newIncident: false,
   	typesOfIncidents: [
   		{id: 1, name: 'Asalto'},
   		{id: 2, name: 'Robo'},
@@ -19,7 +22,6 @@ export default new Vuex.Store({
   		{id: 6, name: 'Venta de Drogas'}
 
   	]
-
   },
   getters: {
   	typesOfIncidents(state) {
@@ -27,15 +29,38 @@ export default new Vuex.Store({
   	},
   	eventLocation (state) {
   		return state.eventLocation
+  	},
+  	checkMobile (state) {
+  		return state.checkMobile
+  	},
+  	newIncident ( state ) {
+  		return state.newIncident
   	}
   },
   mutations: {
   	eventLocation ( state, location ) {
   		state.eventLocation.lng = location.lng
   		state.eventLocation.lat = location.lat
+  	},
+  	newIncident ( state, payload ) {
+  		if (payload.route.path != '/') payload.router.push('/')
+  		state.newIncident = payload.state
+  	},
+  	checkMobile ( state ) {
+			if ( navigator.userAgent.match(/Android/i)
+			|| navigator.userAgent.match(/webOS/i)
+			|| navigator.userAgent.match(/iPhone/i)
+			|| navigator.userAgent.match(/iPad/i)
+			|| navigator.userAgent.match(/iPod/i)
+			|| navigator.userAgent.match(/BlackBerry/i)
+			|| navigator.userAgent.match(/Windows Phone/i)
+			) { 
+				state.checkMobile = true
+			} else {
+				state.checkMobile = false
+      }
   	}
   },
   actions: {
-
   }
 })

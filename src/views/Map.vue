@@ -43,6 +43,7 @@
 import mapboxgl from 'mapbox-gl/dist/mapbox-gl'
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
 import config from '../../config/default'
+import {mapGetters} from 'vuex'
 let center = [-78.485172, -0.187670]
 export default {
   name: 'Map',
@@ -55,7 +56,8 @@ export default {
       zoom: 11,
       clusters: null,
       map: null,
-      marker: null
+      marker: null,
+      geolocator: null
     }
   },
   methods: {
@@ -68,7 +70,16 @@ export default {
         .then(this.drawClusters)
     },
     newIncident () {
+
       this.newEvent = !this.newEvent
+      if(this.newReport === true && this.newEvent == false ) {
+        this.$store.commit({
+          type: 'newIncident', 
+          router: this.$router,
+          route: this.$route,
+          state: false
+        })
+      }
       if (this.newEvent === false && this.marker != null) {
         this.marker.remove()
       } else {
@@ -90,6 +101,7 @@ export default {
         },
         trackUserLocation: true
       })
+      this.geolocator = geolocator
       this.map.addControl(geocoder)
       geocoder.on('result', (ev) => {
         if (this.newEvent === true) {
@@ -146,7 +158,7 @@ export default {
           // from 12/22/15 to 1/21/16 as logged by USGS' Earthquake hazards program.
           data: clusters,
           cluster: true,
-          clusterMaxZoom: 13, // Max zoom to cluster points on
+          clusterMaxZoom: 20, // Max zoom to cluster points on
           clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
         })
 
@@ -244,12 +256,29 @@ export default {
           this.addMarker(MapMouseEvent.lngLat.lng, MapMouseEvent.lngLat.lat)
         }
       })
+    },
+    newReport ( state ) {
+      if (state == true ) {
+        this.fab = !this.fab
+        this.newIncident()
+      }
     }
+  },
+  computed: {
+    ...mapGetters({
+      typeIncident: 'typesOfIncidents',
+      checkMobile: 'checkMobile',
+      newReport: 'newIncident',
+    })
   },
   mounted () {
     this.drawMap()
     this.fetchClusters()
     this.addControls()
+    if(this.newReport == true ) {
+      this.fab = !this.fab
+      this.newIncident()
+    }
   }
 }
 </script>
