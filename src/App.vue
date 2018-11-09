@@ -57,10 +57,10 @@ export default {
     return {
       drawer: null,
       items: [
-        { title: 'Mapa', icon: 'map' },
-        { title: 'Incidentes Recientes', icon: 'feedback' },
+        { title: 'Mapa', icon: 'map', path: '/' },
+        { title: 'Incidentes Recientes', icon: 'feedback', path: '/recent' },
         { title: 'Reportar Incidente', icon: 'record_voice_over' },
-        { title: 'Como Reportar', icon: 'help' }
+        { title: 'Como Reportar', icon: 'help', path: '/about' }
       ]
     }
   },
@@ -77,6 +77,8 @@ export default {
           route: this.$route,
           state: true
         })
+      } else {
+        this.$router.push(item.path)
       }
     },
     checkPointOfView ( ) {
@@ -94,6 +96,6 @@ export default {
 </script>
 <style>
 #deliktum{ max-height: 100vh }
-.container-pc {max-width: 600px}
+.container-pc {max-width: 600px !important}
 .panel-left { background-color: #3b7db5 !important }
 </style>

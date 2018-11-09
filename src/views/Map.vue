@@ -62,12 +62,17 @@ export default {
   },
   methods: {
     fetchClusters () {
-      fetch('http://localhost:3000/api/clusters')
+      fetch('http://localhost:3000/api/clusters',{mode: 'cors'})
         .then(res => res.json())
         .then(res => {
           this.clusters = res
         })
         .then(this.drawClusters)
+        .then(() => {
+        if(this.$route.query.incident) {
+            this.pointIncident(this.$route.query.incident, 'url')
+          }
+        })
     },
     newIncident () {
 
@@ -170,25 +175,25 @@ export default {
           paint: {
             // Use step expressions (https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-step)
             // with three steps to implement three types of circles:
-            //   * Blue, 20px circles when point count is less than 100
-            //   * Yellow, 30px circles when point count is between 100 and 750
-            //   * Pink, 40px circles when point count is greater than or equal to 750
+            //   * Blue, 20px circles when point count is less than 10
+            //   * Yellow, 30px circles when point count is between 100 and 75
+            //   * Pink, 40px circles when point count is greater than or equal to 75
             'circle-color': [
               'step',
               ['get', 'point_count'],
               '#51bbd6',
-              100,
+              10,
               '#f1f075',
-              750,
+              75,
               '#f28cb1'
             ],
             'circle-radius': [
               'step',
               ['get', 'point_count'],
               20,
-              100,
+              10,
               30,
-              750,
+              75,
               40
             ]
           }
@@ -237,19 +242,69 @@ export default {
         this.map.on('mouseleave', 'clusters', () => {
           this.map.getCanvas().style.cursor = ''
         })
+        this.map.on('mouseenter', 'unclustered-point', () => {
+          this.map.getCanvas().style.cursor = 'pointer'
+        })
+        this.map.on('mouseleave', 'unclustered-point', () => {
+          this.map.getCanvas().style.cursor = ''
+        })        
       })
     },
     reportIncident () {
       this.$router.push('report')
-    }
+    },
+    pointIncident(incident, method) {
+      if( method === 'url' ) {
+        let event = this.clusters.features.find( x => x._id === incident )
+        if( !event ) return
+        this.map.easeTo({
+          center: event.geometry.coordinates,
+          zoom: 16
+        })
+        this.showIncident(event)
+      } else if ( method === 'click') {
+        this.$router.push('/?incident='+incident.properties.eventId)
+        let event = this.clusters.features.find( x => x._id === incident.properties.eventId )
+        this.map.easeTo({
+          center: event.geometry.coordinates,
+          zoom: 16
+        })
+        this.showIncident(event)
+      }
 
+    },
+    showIncident(incident) {
+      let type = incident.properties.type
+      let date = incident.properties.date
+      let description = incident.properties.description
+      let imgType = 'img/report/' + type.replace(/ /g,'').toLowerCase() + '.png'
+      let imgUrl = incident.image ? `<img src="http://localhost:3000/${incident.image}">` : ''
+      let popup = new mapboxgl.Popup({ className: 'eventPopup'})
+      .setLngLat(incident.geometry.coordinates)
+      .setHTML(`
+        <div id="popContent">
+          <div>
+            <img src="${imgType}">
+          </div>
+          <div>
+            <h2>${type}</h2>
+            <h3>${date}</h3>
+            <h3>${description}</h3>
+          </div>
+        </div>
+        <div id="imgPopup">
+           ${imgUrl}
+        </div>
+      `)
+      .addTo(this.map);
+    }
   },
   watch: {
     map () {
-      this.map.on('click', 'unclustered-point', function (e) {
+      this.map.on('click', 'unclustered-point',  (e) => {
         let map = e.target
         var features = map.queryRenderedFeatures(e.point, { layers: ['unclustered-point'] })
-        console.log(features[0].properties)
+        this.pointIncident(features[0] , 'click')
       })
       this.map.on('click', (MapMouseEvent) => {
         if (this.newEvent === true) {
@@ -315,5 +370,33 @@ export default {
 }
 #infoIcon:hover {
   background: #4F5D64;
+}
+.eventPopup {
+  color: white !important;
+  min-width: 250px;
+  z-index: 999;
+}
+.eventPopup .mapboxgl-popup-content {
+  background: #353535;
+}
+.eventPopup .mapboxgl-popup-content #popContent {
+  display: grid;
+  grid-template-columns: 75px auto;
+  grid-template-rows: auto auto;
+}
+.eventPopup .mapboxgl-popup-content #imgPopup img {
+  object-fit: cover;
+  max-width: 250px;
+  max-height: 120px;
+  width: 100%;
+}
+.mapboxgl-popup-close-button {
+  top: -15px;
+  right: -10px;
+  background: #EF5350;
+  width: 25px;
+  height: 25px;
+  border-radius: 100%;
+  font-size: 20px;
 }
 </style>

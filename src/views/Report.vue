@@ -145,9 +145,9 @@ export default {
 						const url = 'http://localhost:3000/api/events/image/'+ response._id
 						this.uploadImage(url)						
 					} else {
-						console.log(response)
+						this.$router.push(`/?incident=${response._id}`)
 					}
-				} )
+				})
 				.catch(err => console.log(err))
 			}
 		},
@@ -159,7 +159,7 @@ export default {
     		body: fd
 			})
 			.then(res => res.json())
-			.then(response => console.log(response))
+			.then(response => this.$router.push(`/?incident=${response._id}`) )
 		},
 		showCamera () {
       navigator.mediaDevices.getUserMedia({ video: this.mobileCamera() })
