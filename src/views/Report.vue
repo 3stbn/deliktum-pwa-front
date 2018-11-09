@@ -84,6 +84,7 @@
 </template>
 <script>
 import {mapGetters} from 'vuex'
+import config from '../../config/default'
 export default {
 	name: 'Report',
   data () {
@@ -123,7 +124,7 @@ export default {
 		},
 		reportSubmit (){
 			if (this.$refs.form2.validate()) {
-				fetch('http://localhost:3000/api/events', {
+				fetch(config.url.events, {
 					method: 'post',
 					body: JSON.stringify({ 
 						"properties": {
@@ -142,7 +143,7 @@ export default {
 				.then(res => res.json())
 				.then(response => {
 					if(this.imageToUpload != null ) {
-						const url = 'http://localhost:3000/api/events/image/'+ response._id
+						const url = config.url.events +'/image/' + response._id
 						this.uploadImage(url)						
 					} else {
 						this.$router.push(`/?incident=${response._id}`)

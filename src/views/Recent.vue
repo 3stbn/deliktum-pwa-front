@@ -21,6 +21,7 @@
 </template>
 <script>
 import {mapGetters} from 'vuex'
+import config from '../../config/default'
 export default  {
 	name: 'Recent',
 	data () {
@@ -30,7 +31,7 @@ export default  {
 	},
 	methods: {
 		fetchIncidents(){
-			fetch('http://localhost:3000/api/events',{mode: 'cors'})
+			fetch(config.url.events ,{mode: 'cors'})
 		    .then(res => res.json())
 		    .then(res => {
 		      this.incidents = res

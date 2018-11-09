@@ -62,7 +62,7 @@ export default {
   },
   methods: {
     fetchClusters () {
-      fetch('http://localhost:3000/api/clusters',{mode: 'cors'})
+      fetch( config.url.clusters , {mode: 'cors'})
         .then(res => res.json())
         .then(res => {
           this.clusters = res
@@ -278,7 +278,7 @@ export default {
       let date = incident.properties.date
       let description = incident.properties.description
       let imgType = 'img/report/' + type.replace(/ /g,'').toLowerCase() + '.png'
-      let imgUrl = incident.image ? `<img src="http://localhost:3000/${incident.image}">` : ''
+      let imgUrl = incident.image ? `<img src="${config.url.base+incident.image}">` : ''
       let popup = new mapboxgl.Popup({ className: 'eventPopup'})
       .setLngLat(incident.geometry.coordinates)
       .setHTML(`
