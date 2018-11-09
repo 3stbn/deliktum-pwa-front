@@ -205,8 +205,7 @@ export default {
 		},
 		mobileCamera () {
 			if (this.checkMobile == true ) {
-				/*return { facingMode: { exact: "environment" } }*/
-				return true
+				return { facingMode: { exact: "environment" } }
 			} else {
 				return true
 			}
